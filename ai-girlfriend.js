@@ -1,7 +1,7 @@
 // run `node index.js` in the terminal
 import 'node-fetch';
 import question, { prompt } from 'readline-sync';
-import { readFile } from 'fs/promises';
+const fs = require('fs');
 
 /*let data = {
   model: 'cosmosrp',
@@ -14,7 +14,7 @@ import { readFile } from 'fs/promises';
   ],
 };*/
 
-let data = JSON.parse(readFile(new URL('./memory.json', import.meta.url)));
+let data = JSON.parse(fs.readFileSync('./memory.json', 'utf8'));
 
 const headers = {
   'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ let url = 'https://api.pawan.krd/cosmosrp/v1/chat/completions';
 let debugMode = true;
 
 const addToDatabase = (role, newMessage) => {
-  let data = JSON.parse(readFile(new URL('./memory.json', import.meta.url)));
+  let data = JSON.parse(readFile(new URL('./memory.json', import.meta.url))); // Read the existing data
 
   data.messages = [...data.messages, { role: role, content: newMessage }];
 
