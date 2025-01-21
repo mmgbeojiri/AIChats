@@ -28,9 +28,9 @@ let debugMode = true;
 const addToDatabase = (role, newMessage) => {
   let data = JSON.parse(fs.readFileSync('./memory.json', 'utf8')); // Read the existing data
 
-  data.messages = [...data.messages, { role: role, content: newMessage }];
+  data[0].messages = [...data[0].messages, { role: role, content: newMessage }];
 
-  fs.writeFile('memory.json', data, function (err) {
+  fs.writeFile('memory.json', JSON.stringify(data), function (err) {
     if (err) {
       console.log(err);
     }
