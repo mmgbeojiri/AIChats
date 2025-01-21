@@ -57,6 +57,9 @@ const send = async () => {
   })
     .then((res) => res.json())
     .then((data) => {
+      if (debugMode) {
+      console.log(data)
+      }
       console.log(data.choices[0].message.content);
       addToDatabase(
         data.choices[0].message.role,
