@@ -62,6 +62,10 @@ const send = async () => {
         data.choices[0].message.role,
         data.choices[0].message.content
       );
+    }).then(() => {
+      if (debugMode) {
+        console.log('response received');
+      }
     })
     .finally(() => {
       ask();
