@@ -1,7 +1,7 @@
 // run `node index.js` in the terminal
 import 'node-fetch';
 import question, { prompt } from 'readline-sync';
-const fs = require('fs');
+import * as fs from 'fs';
 
 /*let data = {
   model: 'cosmosrp',
