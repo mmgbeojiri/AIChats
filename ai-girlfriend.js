@@ -26,11 +26,11 @@ let url = 'https://api.pawan.krd/cosmosrp/v1/chat/completions';
 let debugMode = true;
 
 const addToDatabase = (role, newMessage) => {
-  let data = JSON.parse(readFile(new URL('./memory.json', import.meta.url))); // Read the existing data
+  let data = JSON.parse(fs.readFileSync('./memory.json', 'utf8')); // Read the existing data
 
   data.messages = [...data.messages, { role: role, content: newMessage }];
 
-  writeFile('memory.json', data, function (err) {
+  fs.writeFile('memory.json', data, function (err) {
     if (err) {
       console.log(err);
     }
