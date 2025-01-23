@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           
           <Route path="/" element={
-            <Index name={chatBotName} />
+            <Index />
             } />
         </Routes>
       </BrowserRouter>

@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    @apply bg-slate-100;
+}
+
+.messages {
+    @apply h-full overflow-y-auto 
+}
+
+.message {
+    @apply bg-white m-4 rounded-xl p-4 shadow-sm
+}
+
+.message-role{
+    @apply text-xs text-slate-500
+}
+
+.message-content span {
+    @apply text-slate-500 italic
+}
