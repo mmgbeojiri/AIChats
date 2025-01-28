@@ -1,31 +1,11 @@
 // run `node index.js` in the terminal
-import 'node-fetch';
-import question, { prompt } from 'readline-sync';
-import * as fs from 'fs';
-
-/*let data = {
-  model: 'cosmosrp',
-  messages: [
-    {
-      role: 'system',
-      content:
-        'You are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, a man who will assist the player through this world.',
-    },
-  ],
-};*/
+import * as chatAPI from './chatAPI.js';
 
 let data = JSON.parse(fs.readFileSync('./memory.json', 'utf8'));
 
-const headers = {
-  'Content-Type': 'application/json',
-  Accept: 'application/json',
-};
-
-let url = 'https://api.pawan.krd/cosmosrp/v1/chat/completions';
-
 let debugMode = true;
 
-const addToDatabase = (role, newMessage) => {
+/*const addToDatabase = (role, newMessage) => {
   let data = JSON.parse(fs.readFileSync('./memory.json', 'utf8')); // Read the existing data
 
   data[0].messages = [...data[0].messages, { role: role, content: newMessage }];
@@ -35,13 +15,22 @@ const addToDatabase = (role, newMessage) => {
       console.log(err);
     }
   });
-};
+};*/
 
 const ask = () => {
   let newMessage = prompt('User: ');
-  addToDatabase('user', newMessage);
-  send();
+  chatAPI.addToDatabase('user', newMessage, 'memory.json');
+  let dataOutput = chatAPI.sendMessage(data, debugMode);
+
+  console.log(data.choices[0].message.content);
+  chatAPI.addToDatabase(
+        data.choices[0].message.role,
+        data.choices[0].message.content,
+        'memory.json'
+      );
 };
+
+/*
 
 const send = async () => {
   if (debugMode) {
@@ -75,4 +64,5 @@ const send = async () => {
     });
 };
 
+*/
 ask();
