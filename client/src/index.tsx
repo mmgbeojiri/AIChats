@@ -30,7 +30,7 @@ function Index() {
       <div className='messages'>
           <div className='message'>
             <h1 className='message-role'>System</h1>
-            <h1 className='message-content'>Hello world! <span>Shits on you cutely.</span></h1>
+            <h1 className='message-content'>You are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, an artifical assistant who will assist the player through this world.<span>Shits on you cutely.</span></h1>
             </div>
           {
             messageData.map((messageData, index) => {
