@@ -17,7 +17,7 @@ function Index() {
 
   useEffect(() => {
     // Read and parse the memory.json file
-    setMessages(jsonData[0].messages);
+    setMessages(jsonData[0].messages); // remove the comment when running on local
   }, []);
 
   return (
@@ -44,10 +44,14 @@ function Index() {
           }
       </div>
 
-      <div className='flex justify-center gap-1 m-4 bg-white p-2 rounded-xl shadow-sm'>
+          <div className='flex flex-row space-between '>
+      <div className='flex flex-[18] justify-center gap-1 m-4 bg-white p-2 rounded-xl shadow-sm'>
         <input type='text' className="flex-[9] rounded-xl border p-2" placeholder='Type a message...' />
         <button className="flex-[1] p-2 bg-blue-500 duration-100 rounded-xl text-white shadow-sm hover:bg-blue-400" >Send</button>
       </div>
+      <button className='flex flex-1 w-12 h-12 bg-white self-center rounded-full flex items-center justify-center shadow-sm'><img src="https://img.icons8.com/?size=100&id=9730&format=png&color=000000" className='w-6 h-6 ' /></button>
+      </div>
+
     </div>
     </>
   )
