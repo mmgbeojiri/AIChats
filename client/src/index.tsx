@@ -17,7 +17,7 @@ function Index() {
 
   useEffect(() => {
     // Read and parse the memory.json file
-    setMessages(jsonData[0].messages); // remove the comment when running on local
+    setMessages(jsonData); // remove the comment when running on local
   }, []);
 
   return (
