@@ -55,11 +55,16 @@ const ask = async () => {
     console.log(reponseDataOutput);
   }
   console.log(reponseDataOutput.choices[0].message.content);
+
+  if (reponseDataOutput.choices[0].message.content === undefined) {
+    // Failsafe to protect the memory.
+    } else {
   addToDatabase(
     reponseDataOutput.choices[0].message.role,
     reponseDataOutput.choices[0].message.content,
         'memory.json'
       );
+    }
 };
 
 ask();
