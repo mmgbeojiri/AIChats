@@ -1,7 +1,1 @@
-[
-    {
-        "role":"system",
-        "content":"You are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, a man who will assist the player through this world."
- 
-    }
-]
+[{"role":"user","content":"who, or what are you?"},{"role":"assistant","content":" As an artificial assistant, I do not have a physical form or consciousness like humans. However, I am designed to assist players in the fantasy world of Eldoria and provide information about the game mechanics, quests, and other relevant details."}]

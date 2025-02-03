@@ -11,6 +11,7 @@ const reponseModel = await loadModel('orca-mini-3b-gguf2-q4_0.gguf', {
   device: "gpu",
   nCtx: 2048,
 })
+
 const personalityPrompt = "### System:\nYou are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, an artifical assistant who will assist the player through this world./n/n";
 const reponseChatData = await reponseModel.createChatSession({
   temperature: 1,
@@ -18,13 +19,14 @@ const reponseChatData = await reponseModel.createChatSession({
 })
 
 function addToDatabase(role, newMessage, memoryfile) {
-  let data = JSON.parse(fs.readFileSync(memoryfile, 'utf8')); // Read the existing data
+  let data = readfromDatabase(memoryfile) // Read the existing data
 
-  data[0] = [...data, { role: role, content: newMessage }];
+  data = [...data, { role: role, content: newMessage }];
 
   fs.writeFile(memoryfile, JSON.stringify(data), function (err) {
     if (err) {
-      console.log(err);
+      console.log("Error writing to memory file: " + err);
+      fs.writeFile(memoryfile, JSON.stringify([]))
     }
   });
 };
@@ -34,10 +36,21 @@ function readfromDatabase(memoryfile) {
 }
 
 // Load External Memory
+if (readfromDatabase('./memory.json').length > 0) {
 await createCompletion(reponseChatData, readfromDatabase('./memory.json'));
+}
+
+const dispose = () => {
+reponseModel.dispose();
+if(debugMode) {
+  console.log('Model disposed');
+}
+}
 
 const ask = async () => {
   let newMessage = prompt('User: ');
+
+  
 
   if (debugMode) {
     console.log('sending request now');
@@ -45,16 +58,18 @@ const ask = async () => {
     console.log(newMessage);
     console.log('waiting for response...');
   }
+  addToDatabase('user', newMessage, 'memory.json');
   
   let reponseDataOutput = await createCompletion(reponseChatData, newMessage)
 
   console.log('response received');
-  addToDatabase('user', newMessage, 'memory.json');
   //let dataOutput = chatAPI.sendMessage(data, debugMode);
   if (debugMode) {
     console.log(reponseDataOutput);
   }
-  console.log(reponseDataOutput.choices[0].message.content);
+
+  console.log("Role: " + reponseDataOutput.choices[0].message.role);
+  console.log("Content: " + reponseDataOutput.choices[0].message.content);
 
   if (reponseDataOutput.choices[0].message.content === undefined) {
     // Failsafe to protect the memory.
@@ -67,5 +82,5 @@ const ask = async () => {
     }
 };
 
+//dispose();
 ask();
-//reponseModel.dispose();
