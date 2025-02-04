@@ -75,6 +75,8 @@ const respond = async (newMessage) => {
     reponseDataOutput.choices[0].message.content,
     'memory.json'
   );
+
+  return reponseDataOutput.choices[0].message.content;
     
 };
 
