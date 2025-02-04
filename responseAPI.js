@@ -1,5 +1,5 @@
 // run `node index.js` in the terminal
-import {createCompletion, loadModel} from './client/node_modules/gpt4all/src/gpt4all.js'
+import {createCompletion, createCompletionStream, loadModel} from './client/node_modules/gpt4all/src/gpt4all.js'
 import { prompt } from 'readline-sync';
 import * as fs from 'fs';
 
@@ -58,9 +58,19 @@ const respond = async (newMessage) => {
     console.log('waiting for response...');
   }
 
-  addToDatabase('user', newMessage, 'memory.json');
+  await addToDatabase('user', newMessage, 'memory.json');
   
-  let reponseDataOutput = await createCompletion(reponseChatData, newMessage)
+  await addToDatabase('assistant', "", "memory.json"); // initalize a message
+  
+  const reponseDataOutput = await createCompletionStream(reponseChatData, newMessage)
+  
+  reponseDataOutput.tokens.on("data", (string) => {
+    process.stdout.write(string);
+    data[data.length-1].content += string;
+  })
+
+  await reponseDataOutput.result;
+  process.stdout.write("\n")
 
   console.log('response received');
   if (debugMode) {
