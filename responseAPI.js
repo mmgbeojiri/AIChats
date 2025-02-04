@@ -38,7 +38,7 @@ function readfromDatabase(memoryfile) {
 
 // Load External Memory
 if (readfromDatabase('./memory.json').length > 0) {
-  await createCompletion(reponseChatData, readfromDatabase('./memory.json'));
+  let jsonData = await createCompletion(reponseChatData, readfromDatabase('./memory.json'));
 }
 
 const dispose = () => {
