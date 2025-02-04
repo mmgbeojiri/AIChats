@@ -19,6 +19,8 @@ const reponseChatData = await reponseModel.createChatSession({
   systemPrompt: personalityPrompt,
 })
 
+let jsonData = null;
+
 function addToDatabase(role, newMessage, memoryfile) {
   let data = readfromDatabase(memoryfile) // Read the existing data
 
@@ -33,12 +35,13 @@ function addToDatabase(role, newMessage, memoryfile) {
 };
 
 function readfromDatabase(memoryfile) {
-  return JSON.parse(fs.readFileSync(memoryfile, 'utf8'));
+  jsonData = JSON.parse(fs.readFileSync(memoryfile, 'utf8'));
+return jsonData;
 }
 
 // Load External Memory
 if (readfromDatabase('./memory.json').length > 0) {
-  let jsonData = await createCompletion(reponseChatData, readfromDatabase('./memory.json'));
+  await createCompletion(reponseChatData, readfromDatabase('./memory.json'));
 }
 
 const dispose = () => {
@@ -66,7 +69,7 @@ const respond = async (newMessage) => {
   
   reponseDataOutput.tokens.on("data", (string) => {
     process.stdout.write(string);
-    data[data.length-1].content += string;
+    jsonData[jsonData.length-1].content += string;
   })
 
   await reponseDataOutput.result;
