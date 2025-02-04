@@ -1,68 +1,86 @@
 // run `node index.js` in the terminal
-import * as chatAPI from './chatAPI.js';
+import {createCompletion, loadModel} from './client/node_modules/gpt4all/src/gpt4all.js'
+import question, { prompt } from 'readline-sync';
+import * as fs from 'fs';
 
-let data = JSON.parse(fs.readFileSync('./memory.json', 'utf8'));
 
 let debugMode = true;
 
-/*const addToDatabase = (role, newMessage) => {
-  let data = JSON.parse(fs.readFileSync('./memory.json', 'utf8')); // Read the existing data
+const reponseModel = await loadModel('orca-mini-3b-gguf2-q4_0.gguf', {
+  verbose: debugMode,
+  device: "gpu",
+  nCtx: 2048,
+})
 
-  data[0].messages = [...data[0].messages, { role: role, content: newMessage }];
+const personalityPrompt = "### System:\nYou are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, an artifical assistant who will assist the player through this world./n/n";
+const reponseChatData = await reponseModel.createChatSession({
+  temperature: 1,
+  systemPrompt: personalityPrompt,
+})
 
-  fs.writeFile('memory.json', JSON.stringify(data), function (err) {
+function addToDatabase(role, newMessage, memoryfile) {
+  let data = readfromDatabase(memoryfile) // Read the existing data
+
+  data = [...data, { role: role, content: newMessage }];
+
+  fs.writeFile(memoryfile, JSON.stringify(data), function (err) {
     if (err) {
-      console.log(err);
+      console.log("Error writing to memory file: " + err);
+      fs.writeFile(memoryfile, JSON.stringify([]))
     }
   });
-};*/
-
-const ask = () => {
-  let newMessage = prompt('User: ');
-  chatAPI.addToDatabase('user', newMessage, 'memory.json');
-  let dataOutput = chatAPI.sendMessage(data, debugMode);
-
-  console.log(data.choices[0].message.content);
-  chatAPI.addToDatabase(
-        data.choices[0].message.role,
-        data.choices[0].message.content,
-        'memory.json'
-      );
 };
 
-/*
+function readfromDatabase(memoryfile) {
+  return JSON.parse(fs.readFileSync(memoryfile, 'utf8'));
+}
 
-const send = async () => {
+// Load External Memory
+if (readfromDatabase('./memory.json').length > 0) {
+await createCompletion(reponseChatData, readfromDatabase('./memory.json'));
+}
+
+const dispose = () => {
+reponseModel.dispose();
+if(debugMode) {
+  console.log('Model disposed');
+}
+}
+
+const ask = async () => {
+  let newMessage = prompt('User: ');
+
+  
+
   if (debugMode) {
     console.log('sending request now');
-    console.log(data);
+    console.log(reponseChatData);
+    console.log(newMessage);
     console.log('waiting for response...');
   }
+  addToDatabase('user', newMessage, 'memory.json');
+  
+  let reponseDataOutput = await createCompletion(reponseChatData, newMessage)
 
-  let response = await fetch(url, {
-    method: 'POST',
-    headers: headers,
-    body: JSON.stringify(data),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (debugMode) {
-      console.log(data)
-      }
-      console.log(data.choices[0].message.content);
-      addToDatabase(
-        data.choices[0].message.role,
-        data.choices[0].message.content
+  console.log('response received');
+  //let dataOutput = chatAPI.sendMessage(data, debugMode);
+  if (debugMode) {
+    console.log(reponseDataOutput);
+  }
+
+  console.log("Role: " + reponseDataOutput.choices[0].message.role);
+  console.log("Content: " + reponseDataOutput.choices[0].message.content);
+
+  if (reponseDataOutput.choices[0].message.content === undefined) {
+    // Failsafe to protect the memory.
+    } else {
+  addToDatabase(
+    reponseDataOutput.choices[0].message.role,
+    reponseDataOutput.choices[0].message.content,
+        'memory.json'
       );
-    }).then(() => {
-      if (debugMode) {
-        console.log('response received');
-      }
-    })
-    .finally(() => {
-      ask();
-    });
+    }
 };
 
-*/
+//dispose();
 ask();

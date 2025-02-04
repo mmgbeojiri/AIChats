@@ -37,6 +37,8 @@ function addToDatabase(role, newMessage, memoryfile) {
 };
 
 
+
+
 async function sendMessage(dataInput, debugMode) {
   if (debugMode) {
     console.log('sending request now');

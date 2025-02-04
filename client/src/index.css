@@ -21,3 +21,7 @@ body {
 .message-content span {
     @apply text-slate-500 italic
 }
+
+.circle-button {
+    @apply flex min-w-12 h-12 bg-white self-center rounded-full flex items-center justify-center shadow-sm
+}
