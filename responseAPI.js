@@ -48,8 +48,8 @@ const dispose = () => {
   }
 }
 
-const ask = async () => {
-  let newMessage = prompt();
+const respond = async (newMessage) => {
+ 
 
   if (debugMode) {
     console.log('sending request now');
@@ -79,4 +79,5 @@ const ask = async () => {
 };
 
 //dispose();
-ask();
+let newMessage = prompt();
+respond(newMessage);
