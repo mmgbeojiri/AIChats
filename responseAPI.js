@@ -24,12 +24,13 @@ let jsonData = null;
 async function addToDatabase(role, newMessage, memoryfile) {
   await readfromDatabase(memoryfile) // Read the existing data
 
-  jsonData = [...data, { role: role, content: newMessage }];
+  jsonData = [...jsonData, { role: role, content: newMessage }];
   //failsafe.com
   if (jsonData == "" || jsonData == undefined || jsonData == null ) {
     console.log("MemoryWrite halted to preserve memory.json. The data we got has no value and would delete the entire file.")
-    return;
+    return Error("Write Halted");
   }
+  console.log(`jsonData: ${jsonData}`);
   await fs.writeFile(memoryfile, JSON.stringify(jsonData), function (err) {
     if (err) {
       console.log("Error writing to memory file: " + err);
@@ -39,8 +40,8 @@ async function addToDatabase(role, newMessage, memoryfile) {
 };
 
 async function readfromDatabase(memoryfile) {
-  jsonData = await JSON.parse(fs.readFileSync(memoryfile, 'utf8'));
-return jsonData;
+  jsonData = await JSON.parse(fs.readFileSync(memoryfile, 'utf8'), (err) => { console.log("Error reading from memory file: " + err); });
+  return jsonData;
 }
 
 // Load External Memory
@@ -64,11 +65,10 @@ const respond = async (newMessage) => {
     console.log(newMessage);
     console.log('waiting for response...');
   }
-
-  await addToDatabase('user', newMessage, 'memory.json');
+  await addToDatabase('user', newMessage, './memory.json');
   
-  await addToDatabase('assistant', "", "memory.json"); // initalize a message
-  
+  await addToDatabase('assistant', "", "./memory.json"); // initalize a message
+  return
   const reponseDataOutput = await createCompletionStream(reponseChatData, newMessage)
   
   reponseDataOutput.tokens.on("data", (data) => {
