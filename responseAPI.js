@@ -25,11 +25,14 @@ function addToDatabase(role, newMessage, memoryfile) {
   let data = readfromDatabase(memoryfile) // Read the existing data
 
   data = [...data, { role: role, content: newMessage }];
-
+  //failsafe.com
+  if (data == "" || data == undefined || data == null ) {
+    console.log("MemoryWrite halted to preserve memory.json. The data we got has no value and would delete the entire file.")
+    return;
+  }
   fs.writeFile(memoryfile, JSON.stringify(data), function (err) {
     if (err) {
       console.log("Error writing to memory file: " + err);
-      fs.writeFile(memoryfile, JSON.stringify([])) // this is the true failsafe.
     }
   });
 };
