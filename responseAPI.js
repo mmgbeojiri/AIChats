@@ -21,8 +21,8 @@ const reponseChatData = await reponseModel.createChatSession({
 
 let jsonData = null;
 
-function addToDatabase(role, newMessage, memoryfile) {
-  let data = readfromDatabase(memoryfile) // Read the existing data
+async function addToDatabase(role, newMessage, memoryfile) {
+  let data = await readfromDatabase(memoryfile) // Read the existing data
 
   data = [...data, { role: role, content: newMessage }];
   //failsafe.com
@@ -30,15 +30,15 @@ function addToDatabase(role, newMessage, memoryfile) {
     console.log("MemoryWrite halted to preserve memory.json. The data we got has no value and would delete the entire file.")
     return;
   }
-  fs.writeFile(memoryfile, JSON.stringify(data), function (err) {
+  await fs.writeFile(memoryfile, JSON.stringify(data), function (err) {
     if (err) {
       console.log("Error writing to memory file: " + err);
     }
   });
 };
 
-function readfromDatabase(memoryfile) {
-  jsonData = JSON.parse(fs.readFileSync(memoryfile, 'utf8'));
+async function readfromDatabase(memoryfile) {
+  jsonData = await JSON.parse(fs.readFileSync(memoryfile, 'utf8'));
 return jsonData;
 }
 
@@ -86,7 +86,7 @@ const respond = async (newMessage) => {
   console.log("Role: " + reponseDataOutput.choices[0].message.role);
   console.log("Content: " + reponseDataOutput.choices[0].message.content);
 
-  addToDatabase(
+  await addToDatabase(
     reponseDataOutput.choices[0].message.role,
     reponseDataOutput.choices[0].message.content,
     'memory.json'
