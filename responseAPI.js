@@ -70,9 +70,9 @@ const respond = async (newMessage) => {
   
   const reponseDataOutput = await createCompletionStream(reponseChatData, newMessage)
   
-  reponseDataOutput.tokens.on("data", (string) => {
-    process.stdout.write(string);
-    jsonData[jsonData.length-1].content += string;
+  reponseDataOutput.tokens.on("data", (data) => {
+    process.stdout.write(data);
+    jsonData[jsonData.length-1].content += data;
   })
 
   await reponseDataOutput.result;
