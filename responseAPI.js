@@ -67,7 +67,7 @@ const appendToLastMessage = async (substring) => {
 
   jsonData[jsonData.length-1].content += substring;
 
-  fs.writeFile("./memory.json", JSON.stringify(jsonData))
+  await fs.writeFile("./memory.json", JSON.stringify(jsonData))
 
   return substring;
 }
