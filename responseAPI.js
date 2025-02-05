@@ -30,7 +30,6 @@ async function addToDatabase(role, newMessage, memoryfile) {
     console.log("MemoryWrite halted to preserve memory.json. The data we got has no value and would delete the entire file.")
     return Error("Write Halted");
   }
-  console.log(`jsonData: ${jsonData}`);
   await fs.writeFile(memoryfile, JSON.stringify(jsonData), function (err) {
     if (err) {
       console.log("Error writing to memory file: " + err);
@@ -41,12 +40,14 @@ async function addToDatabase(role, newMessage, memoryfile) {
 
 async function readfromDatabase(memoryfile) {
   jsonData = await JSON.parse(
-    fs.readFileSync(memoryfile, 'utf8', 
+    await fs.readFileSync(memoryfile, 'utf8', 
       function (err) { 
         console.log("Error reading from memory file: " + err); 
+        return Error("Read Halted");
       }
     )
   );
+  console.log(`jsonData: ${jsonData}`);
   return jsonData;
 }
 
