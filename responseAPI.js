@@ -62,6 +62,16 @@ const dispose = () => {
   }
 }
 
+const appendToLastMessage = async (substring) => { 
+  await readfromDatabase('./memory.json');
+
+  jsonData[jsonData.length-1].content += substring;
+
+  fs.writeFile("./memory.json", JSON.stringify(jsonData))
+
+  return substring;
+}
+
 const respond = async (newMessage) => {
  
 
@@ -80,10 +90,10 @@ const respond = async (newMessage) => {
 
   const reponseDataOutput = await createCompletionStream(reponseChatData, newMessage)
   
-  reponseDataOutput.tokens.on("data", (data) => {
+  reponseDataOutput.tokens.on("data", async (data) => {
     process.stdout.write(data);
-    jsonData[jsonData.length-1].content += data;
-    fs.writeFile("./memory.json", JSON.stringify(jsonData))
+    await appendToLastMessage(data);
+    
   })
 
   await reponseDataOutput.result;
@@ -91,7 +101,7 @@ const respond = async (newMessage) => {
 
   console.log('response received');
   if (debugMode) {
-    console.log(reponseDataOutput);
+    console.log(reponseDataOutput.result);
   }
 
   console.log("Role: " + reponseDataOutput.choices[0].message.role);
