@@ -40,7 +40,13 @@ async function addToDatabase(role, newMessage, memoryfile) {
 };
 
 async function readfromDatabase(memoryfile) {
-  jsonData = await JSON.parse(fs.readFileSync(memoryfile, 'utf8'), (err) => { console.log("Error reading from memory file: " + err); });
+  jsonData = await JSON.parse(
+    fs.readFileSync(memoryfile, 'utf8', 
+      function (err) { 
+        console.log("Error reading from memory file: " + err); 
+      }
+    )
+  );
   return jsonData;
 }
 
