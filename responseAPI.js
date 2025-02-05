@@ -47,7 +47,6 @@ async function readfromDatabase(memoryfile) {
       }
     )
   );
-  console.log(`jsonData: ${jsonData}`);
   return jsonData;
 }
 
@@ -73,9 +72,12 @@ const respond = async (newMessage) => {
     console.log('waiting for response...');
   }
   await addToDatabase('user', newMessage, './memory.json');
-  
+
+  // Look, this is too fast. It's going to break. set a timeout so that the file finishes writing before we read it again.
+  await new Promise(resolve => setTimeout(resolve, 100)); // Wait for a new response. This will resolve in 100 milliseconds.
+
   await addToDatabase('assistant', "", "./memory.json"); // initalize a message
-  return
+
   const reponseDataOutput = await createCompletionStream(reponseChatData, newMessage)
   
   reponseDataOutput.tokens.on("data", (data) => {
