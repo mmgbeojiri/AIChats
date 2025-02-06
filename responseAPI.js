@@ -67,7 +67,7 @@ const appendToLastMessage = async (substring) => {
 
   jsonData[jsonData.length-1].content += substring;
 
-  await fs.writeFile("./memory.json", JSON.stringify(jsonData))
+  await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err) { return Error("Appendation Halted"); });
 
   return substring;
 }
@@ -92,28 +92,44 @@ const respond = async (newMessage) => {
   
   reponseDataOutput.tokens.on("data", async (data) => {
     process.stdout.write(data);
-    await appendToLastMessage(data);
+    await readfromDatabase('./memory.json');
+    jsonData[jsonData.length-1].content += data;
+    await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err) { return Error("Appendation Halted"); });
     
   })
 
-  await reponseDataOutput.result;
+  let APIResponse = await reponseDataOutput.result;
   process.stdout.write("\n")
 
   console.log('response received');
   if (debugMode) {
     console.log(reponseDataOutput.result);
+    console.log(APIResponse)
   }
+  /* this is responseDataOutput.result
+  Promise {
+    {
+      model: 'orca-mini-3b-gguf2-q4_0.gguf',
+      usage: {
+        prompt_tokens: 28,
+        total_tokens: 43,
+        completion_tokens: 15,
+        n_past_tokens: 93
+      },
+      choices: [ [Object] ]
+    }
+  }
+    */
+   console.log("Role: " + APIResponse.result.choices[0].message.role);
+   console.log("Content: " + APIResponse.result.choices[0].message.content);
 
-  console.log("Role: " + reponseDataOutput.choices[0].message.role);
-  console.log("Content: " + reponseDataOutput.choices[0].message.content);
-
-  await addToDatabase(
+  /*await addToDatabase(
     reponseDataOutput.choices[0].message.role,
     reponseDataOutput.choices[0].message.content,
     'memory.json'
-  );
+  );*/
 
-  return reponseDataOutput.choices[0].message.content;
+  return APIResponse.result.choices[0].message.content;
     
 };
 
