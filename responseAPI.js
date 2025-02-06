@@ -3,7 +3,6 @@ import {createCompletion, createCompletionStream, loadModel} from './client/node
 import { prompt } from 'readline-sync';
 import * as fs from 'fs';
 
-
 let debugMode = true;
 
 const reponseModel = await loadModel('orca-mini-3b-gguf2-q4_0.gguf', { // change this to uncensored model STAT!!!
@@ -12,7 +11,7 @@ const reponseModel = await loadModel('orca-mini-3b-gguf2-q4_0.gguf', { // change
   nCtx: 2048,
 })
 
-const personalityPrompt = "### System:\nYou are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, an artifical assistant who will assist the player through this world./n/n";
+const personalityPrompt = "### System:\nYou are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, an artifically-made assistant who will assist the player through this world. You take the form of a physical human body. You will assist the player in their ventures through Eldoria, and answer any questions they have about the world./n/n";
 
 const reponseChatData = await reponseModel.createChatSession({
   temperature: 1,
@@ -62,18 +61,7 @@ const dispose = () => {
   }
 }
 
-const appendToLastMessage = async (substring) => { 
-  await readfromDatabase('./memory.json');
-
-  jsonData[jsonData.length-1].content += substring;
-
-  await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err) { return Error("Appendation Halted"); });
-
-  return substring;
-}
-
 const respond = async (newMessage) => {
- 
 
   if (debugMode) {
     console.log('sending request now');
@@ -106,28 +94,9 @@ const respond = async (newMessage) => {
     console.log(reponseDataOutput.result);
     console.log(APIResponse)
   }
-  /* this is responseDataOutput.result
-  Promise {
-    {
-      model: 'orca-mini-3b-gguf2-q4_0.gguf',
-      usage: {
-        prompt_tokens: 28,
-        total_tokens: 43,
-        completion_tokens: 15,
-        n_past_tokens: 93
-      },
-      choices: [ [Object] ]
-    }
-  }
-    */
+
    console.log("Role: " + APIResponse.choices[0].message.role);
    console.log("Content: " + APIResponse.choices[0].message.content);
-
-  /*await addToDatabase(
-    reponseDataOutput.choices[0].message.role,
-    reponseDataOutput.choices[0].message.content,
-    'memory.json'
-  );*/
 
   return APIResponse.choices[0].message.content;
     
