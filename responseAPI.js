@@ -120,8 +120,8 @@ const respond = async (newMessage) => {
     }
   }
     */
-   console.log("Role: " + APIResponse.result.choices[0].message.role);
-   console.log("Content: " + APIResponse.result.choices[0].message.content);
+   console.log("Role: " + APIResponse.choices[0].message.role);
+   console.log("Content: " + APIResponse.choices[0].message.content);
 
   /*await addToDatabase(
     reponseDataOutput.choices[0].message.role,
@@ -129,7 +129,7 @@ const respond = async (newMessage) => {
     'memory.json'
   );*/
 
-  return APIResponse.result.choices[0].message.content;
+  return APIResponse.choices[0].message.content;
     
 };
 
