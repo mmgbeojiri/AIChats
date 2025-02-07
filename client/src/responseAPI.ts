@@ -1,6 +1,5 @@
 // run `node index.js` in the terminal
-import {createCompletion, createCompletionStream, loadModel} from './client/node_modules/gpt4all/src/gpt4all.js'
-import { prompt } from 'readline-sync';
+import {createCompletion, createCompletionStream, loadModel} from 'gpt4all'
 import * as fs from 'fs';
 
 let debugMode = true;
@@ -18,18 +17,25 @@ const reponseChatData = await reponseModel.createChatSession({
   systemPrompt: personalityPrompt,
 })
 
-let jsonData = null;
+type role = "system" | "user" | "assistant";
 
-async function addToDatabase(role, newMessage, memoryfile) {
+interface Message {
+  role: role,
+  content: string
+}
+
+let jsonData: Message[] | null = null;
+
+async function addToDatabase(role:role, newMessage:string, memoryfile:string) {
   await readfromDatabase(memoryfile) // Read the existing data
 
-  jsonData = [...jsonData, { role: role, content: newMessage }];
+  jsonData = [...(jsonData || []), { role: role, content: newMessage }];
   //failsafe.com
-  if (jsonData == "" || jsonData == undefined || jsonData == null ) {
+  if (jsonData == undefined || jsonData == null ) {
     console.log("MemoryWrite halted to preserve memory.json. The data we got has no value and would delete the entire file.")
     return Error("Write Halted");
   }
-  await fs.writeFile(memoryfile, JSON.stringify(jsonData), function (err) {
+  await fs.writeFile(memoryfile, JSON.stringify(jsonData), function (err: Error) {
     if (err) {
       console.log("Error writing to memory file: " + err);
     }
@@ -37,10 +43,10 @@ async function addToDatabase(role, newMessage, memoryfile) {
   return jsonData;
 };
 
-async function readfromDatabase(memoryfile) {
+async function readfromDatabase(memoryfile: string): Promise<Message[] | null> {
   jsonData = await JSON.parse(
     await fs.readFileSync(memoryfile, 'utf8', 
-      function (err) { 
+      function (err: Error) { 
         console.log("Error reading from memory file: " + err); 
         return Error("Read Halted");
       }
@@ -50,8 +56,11 @@ async function readfromDatabase(memoryfile) {
 }
 
 // Load External Memory
-if (readfromDatabase('./memory.json').length > 0) {
-  await createCompletion(reponseChatData, readfromDatabase('./memory.json'));
+let externalMemory: Message[] | null = await readfromDatabase('./memory.json');
+if (externalMemory != null) {
+  if(externalMemory.length > 0) {
+  await createCompletion(reponseChatData, externalMemory);
+  }
 }
 
 const dispose = () => {
@@ -61,7 +70,7 @@ const dispose = () => {
   }
 }
 
-const respond = async (newMessage) => {
+const respond = async (newMessage: string) => {
 
   if (debugMode) {
     console.log('sending request now');
@@ -78,11 +87,11 @@ const respond = async (newMessage) => {
 
   const reponseDataOutput = await createCompletionStream(reponseChatData, newMessage)
   
-  reponseDataOutput.tokens.on("data", async (data) => {
+  reponseDataOutput.tokens.on("data", async (data: string) => {
     process.stdout.write(data);
     await readfromDatabase('./memory.json');
     jsonData[jsonData.length-1].content += data;
-    await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err) { return Error("Appendation Halted"); });
+    await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err: Error) { return Error("Appendation Halted"); });
     
   })
 
