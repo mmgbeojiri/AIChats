@@ -88,15 +88,17 @@ const respond = async (newMessage: string) => {
   const reponseDataOutput = await createCompletionStream(reponseChatData, newMessage)
   
   reponseDataOutput.tokens.on("data", async (data: string) => {
-    process.stdout.write(data);
+    console.log(data);
     await readfromDatabase('./memory.json');
+    if (jsonData != null) {
     jsonData[jsonData.length-1].content += data;
+    }
     await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err: Error) { return Error("Appendation Halted"); });
     
   })
 
   let APIResponse = await reponseDataOutput.result;
-  process.stdout.write("\n")
+  console.log("\n")
 
   console.log('response received');
   if (debugMode) {
@@ -112,5 +114,5 @@ const respond = async (newMessage: string) => {
 };
 
 //dispose();
-let newMessage = prompt();
-respond(newMessage);
+/*let newMessage = prompt();
+respond(newMessage);*/
