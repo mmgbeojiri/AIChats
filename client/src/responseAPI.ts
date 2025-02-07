@@ -35,23 +35,23 @@ async function addToDatabase(role:role, newMessage:string, memoryfile:string) {
     console.log("MemoryWrite halted to preserve memory.json. The data we got has no value and would delete the entire file.")
     return Error("Write Halted");
   }
-  await fs.writeFile(memoryfile, JSON.stringify(jsonData), function (err: Error) {
+  await fs.writeFile(memoryfile, JSON.stringify(jsonData), 
+  function (err: Error | null) {
     if (err) {
       console.log("Error writing to memory file: " + err);
     }
-  });
+  }
+);
   return jsonData;
 };
 
 async function readfromDatabase(memoryfile: string): Promise<Message[] | null> {
-  jsonData = await JSON.parse(
-    await fs.readFileSync(memoryfile, 'utf8', 
-      function (err: Error) { 
-        console.log("Error reading from memory file: " + err); 
-        return Error("Read Halted");
-      }
-    )
-  );
+  try {
+    const data = await fs.promises.readFile(memoryfile, 'utf8');
+    jsonData = JSON.parse(data);
+  } catch (err) {
+    console.log("Error reading memory file: " + err);
+  }
   return jsonData;
 }
 
@@ -93,7 +93,7 @@ const respond = async (newMessage: string) => {
     if (jsonData != null) {
     jsonData[jsonData.length-1].content += data;
     }
-    await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err: Error) { return Error("Appendation Halted"); });
+    await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err: Error | null) { return Error("Appendation Halted"); });
     
   })
 
