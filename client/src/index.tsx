@@ -3,6 +3,7 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './index.css'
 import jsonData from "./memory.json"
+import { getData, firstMessage } from './responseAPI'
 
 const name: string = 'Glem'
 
@@ -17,7 +18,7 @@ function Index() {
 
   useEffect(() => {
     // Read and parse the memory.json file
-    setMessages(jsonData); // remove the comment when running on local
+    setMessages( getData() ); // remove the comment when running on local
   }, []);
 
   return (
@@ -30,7 +31,7 @@ function Index() {
       <div className='messages'>
           <div className='message'>
             <h1 className='message-role'>System</h1>
-            <h1 className='message-content'>You are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, an artifical assistant who will assist the player through this world.<span>Shits on you cutely.</span></h1>
+            <h1 className='message-content'>{firstMessage}</h1>
             </div>
           {
             messageData.map((messageData, index) => {

@@ -2,7 +2,7 @@
 import {createCompletion, createCompletionStream, loadModel} from 'gpt4all'
 import * as fs from 'fs';
 
-let debugMode = true;
+let debugMode: boolean = true;
 
 const reponseModel = await loadModel('orca-mini-3b-gguf2-q4_0.gguf', { // change this to uncensored model STAT!!!
   verbose: debugMode,
@@ -10,7 +10,8 @@ const reponseModel = await loadModel('orca-mini-3b-gguf2-q4_0.gguf', { // change
   nCtx: 2048,
 })
 
-const personalityPrompt = "### System:\nYou are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, an artifically-made assistant who will assist the player through this world. You take the form of a physical human body. You will assist the player in their ventures through Eldoria, and answer any questions they have about the world./n/n";
+const personalityPrompt: string = "### System:\nYou are a fantasy game master. The setting is a magical fantasy world called Eldoria. You are the assistant Glem, an artifically-made assistant who will assist the player through this world. You take the form of a physical human body. You will assist the player in their ventures through Eldoria, and answer any questions they have about the world./n/n";
+export const firstMessage: string = "Hi! My name is Glem, and welcome to the magical world of Eldoria. Let me know if there's anything you want to know."
 
 const reponseChatData = await reponseModel.createChatSession({
   temperature: 1,
@@ -83,19 +84,21 @@ const respond = async (newMessage: string) => {
   // Look, this is too fast. It's going to break. set a timeout so that the file finishes writing before we read it again.
   await new Promise(resolve => setTimeout(resolve, 100)); // Wait for a new response. This will resolve in 100 milliseconds.
 
-  await addToDatabase('assistant', "", "./memory.json"); // initalize a message
+  // initalize a message
+  await readfromDatabase("./memory.json")
+  jsonData = [...(jsonData || []), { role: "assistant", content: "" }];
 
   const reponseDataOutput = await createCompletionStream(reponseChatData, newMessage)
   
   reponseDataOutput.tokens.on("data", async (data: string) => {
     console.log(data);
-    await readfromDatabase('./memory.json');
     if (jsonData != null) {
-    jsonData[jsonData.length-1].content += data;
+      jsonData[jsonData.length-1].content += data;
     }
-    await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err: Error | null) { return Error("Appendation Halted"); });
-    
   })
+
+  await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err: Error | null) { return Error("Appendation Halted"); });
+
 
   let APIResponse = await reponseDataOutput.result;
   console.log("\n")
@@ -112,6 +115,12 @@ const respond = async (newMessage: string) => {
   return APIResponse.choices[0].message.content;
     
 };
+
+export function getData() {
+  return jsonData ? jsonData : [];
+}
+
+export default {firstMessage}
 
 //dispose();
 /*let newMessage = prompt();
