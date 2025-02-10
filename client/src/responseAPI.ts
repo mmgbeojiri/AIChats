@@ -1,6 +1,7 @@
 // run `node index.js` in the terminal
 import {createCompletion, createCompletionStream, loadModel} from 'gpt4all'
 import * as fs from 'fs';
+import axios from 'axios';
 
 let debugMode: boolean = true;
 
@@ -36,20 +37,24 @@ async function addToDatabase(role:role, newMessage:string, memoryfile:string) {
     console.log("MemoryWrite halted to preserve memory.json. The data we got has no value and would delete the entire file.")
     return Error("Write Halted");
   }
-  await fs.writeFile(memoryfile, JSON.stringify(jsonData), 
-  function (err: Error | null) {
+  try {
+  await axios.post("localhost:3000/memory", jsonData)
+  } catch (err: Error | null) {
     if (err) {
       console.log("Error writing to memory file: " + err);
     }
-  }
-);
+  }}
+
   return jsonData;
 };
 
 async function readfromDatabase(memoryfile: string): Promise<Message[] | null> {
   try {
-    const data = await fs.promises.readFile(memoryfile, 'utf8');
-    jsonData = JSON.parse(data);
+    await axios.get("localhost:3000/memory")
+    .then((response) => {
+      jsonData = JSON.parse(response.data);
+    });
+    
   } catch (err) {
     console.log("Error reading memory file: " + err);
   }
@@ -60,7 +65,7 @@ async function readfromDatabase(memoryfile: string): Promise<Message[] | null> {
 let externalMemory: Message[] | null = await readfromDatabase('./memory.json');
 if (externalMemory != null) {
   if(externalMemory.length > 0) {
-  await createCompletion(reponseChatData, externalMemory);
+    await createCompletion(reponseChatData, externalMemory);
   }
 }
 

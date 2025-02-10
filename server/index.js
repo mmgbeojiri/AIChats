@@ -34,8 +34,15 @@ app.use(express.json());
 });*/
 
 app.routes("/memory").get((req, res) => {
-    jsonData = fs.promises.readFile(memoryfile, 'utf8')
+    jsonData = fs.readFile(memoryfile, 'utf8')
     res.send(jsonData)
+}).post((req, res) => {
+    jsonData = fs.writeFile(memoryfile, JSON.stringify(req), function (err) {
+        if (err) {
+          res.sendStatus(500).send("Error writing to memory file: " + err);
+        }
+      }); 
+    res.sendStatus(200).send(jsonData)
 });
 
 app.listen(3000, () => {
