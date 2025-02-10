@@ -3,6 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const EntrySchema = require('./model/Schema.js');
 const mongooseServer = 'mongodb://localhost:27017/database'
+const fs = require('fs');
 
 /*mongoose.connect(mongooseServer, {useNewUrlParser: true, useUnifiedTopology: true})
 .then(() => console.log('Connected to MongoDB'))
@@ -32,9 +33,11 @@ app.use(express.json());
         
     });
 });*/
-
+const memoryfile = 'memory.json'
 app.route("/memory").get((req, res) => {
-    jsonData = fs.readFile(memoryfile, 'utf8')
+    jsonData = fs.readFile(memoryfile, 'utf8', (err) => {
+        res.sendStatus(500).send("Error reading to memory file: " + err);
+    })
     res.send(jsonData)
 }).post((req, res) => {
     jsonData = fs.writeFile(memoryfile, JSON.stringify(req), function (err) {
