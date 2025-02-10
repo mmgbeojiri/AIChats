@@ -39,11 +39,11 @@ async function addToDatabase(role:role, newMessage:string, memoryfile:string) {
   }
   try {
   await axios.post("localhost:3000/memory", jsonData)
-  } catch (err: Error | null) {
+  } catch (err: any) {
     if (err) {
       console.log("Error writing to memory file: " + err);
     }
-  }}
+  }
 
   return jsonData;
 };
