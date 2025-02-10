@@ -33,7 +33,10 @@ app.use(express.json());
     });
 });*/
 
-app.get('/memory', (req, res) => { });
+app.routes("/memory").get((req, res) => {
+    jsonData = fs.promises.readFile(memoryfile, 'utf8')
+    res.send(jsonData)
+});
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
