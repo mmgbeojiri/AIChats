@@ -71,7 +71,7 @@ const dispose = () => {
   }
 }
 
-const respond = async (newMessage: string) => {
+export const respond = async (newMessage: string) => {
 
   if (debugMode) {
     console.log('sending request now');
