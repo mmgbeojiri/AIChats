@@ -1,6 +1,6 @@
 // run `node index.js` in the terminal
 import {createCompletion, createCompletionStream, loadModel} from 'gpt4all'
-import * as fs from 'fs';
+//import * as fs from 'fs';
 import axios from 'axios';
 
 let debugMode: boolean = true;
@@ -38,7 +38,7 @@ async function addToDatabase(role:role, newMessage:string, memoryfile:string) {
     return Error("Write Halted");
   }
   try {
-  await axios.post("localhost:3000/memory", jsonData)
+  await axios.post("localhost:3000/memory", JSON.stringify(jsonData))
   } catch (err: any) {
     if (err) {
       console.log("Error writing to memory file: " + err);
@@ -102,8 +102,8 @@ export const respond = async (newMessage: string) => {
     }
   })
 
-  await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err: Error | null) { return Error("Appendation Halted"); });
-
+  //await fs.writeFile("./memory.json", JSON.stringify(jsonData), function (err: Error | null) { return Error("Appendation Halted"); });
+  await axios.post("localhost:3000/memory", JSON.stringify(jsonData))
 
   let APIResponse = await reponseDataOutput.result;
   console.log("\n")

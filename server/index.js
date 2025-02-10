@@ -33,7 +33,7 @@ app.use(express.json());
     });
 });*/
 
-app.routes("/memory").get((req, res) => {
+app.route("/memory").get((req, res) => {
     jsonData = fs.readFile(memoryfile, 'utf8')
     res.send(jsonData)
 }).post((req, res) => {
