@@ -34,6 +34,11 @@ app.use(express.json());
     });
 });*/
 const memoryfile = 'memory.json'
+
+app.get('/', (req, res) => { 
+    res.send('Hello World');
+});
+
 app.route("/memory").get((req, res) => {
     jsonData = fs.readFile(memoryfile, 'utf8', (err) => {
         res.sendStatus(500).send("Error reading to memory file: " + err);
@@ -43,6 +48,7 @@ app.route("/memory").get((req, res) => {
     jsonData = fs.writeFile(memoryfile, JSON.stringify(req), function (err) {
         if (err) {
           res.sendStatus(500).send("Error writing to memory file: " + err);
+          return;
         }
       }); 
     res.sendStatus(200).send(jsonData)
